@@ -35,7 +35,7 @@ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple docxtpl python-docx jinj
 ├── README.md                 ← 本文件，先看这个
 ├── run.py                    ← 再跑这个
 ├── 01_raw_data/              ← 你的原始数据放这
-│   └── 检验结果.csv            utf-8-sig 带 BOM，跟 LIMS 导出一致
+│   └── 检验结果.csv            utf-8-sig 带 BOM，跟仪器导出一致
 ├── 02_output/                ← 跑完的成品在这（脚本自动生成）
 └── source/                   ← 模板、日志、维护脚本；日常不用碰
     ├── templates/

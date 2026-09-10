@@ -127,7 +127,7 @@ tpl = TPL_DIR / "检验报告模板.xlsx"
 wb.save(tpl)
 print(f"模板已生成: {tpl}")
 
-# ---------- 造 CSV（utf-8-sig，模拟 LIMS 导出带 BOM） ----------
+# ---------- 造 CSV（utf-8-sig，模拟仪器导出带 BOM） ----------
 rows = []
 
 

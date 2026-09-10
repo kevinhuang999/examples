@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""造示例数据：模拟 QA 在 Word 里排好的报告书模板 + LIMS 导出的 CSV。
+"""造示例数据：模拟 QA 在 Word 里排好的报告书模板 + 仪器导出的 CSV。
 
 运行一次即可，会在当前目录下生成 templates/ 与 data/。
-真实使用时不需要这一步——模板由 QA 用 Word 排好，CSV 由 LIMS 导出。
+真实使用时不需要这一步——模板由 QA 用 Word 排好，CSV 由仪器导出。
 """
 import subprocess
 import sys
@@ -77,7 +77,7 @@ doc.save(BASE / "source" / "templates" / "检验报告书模板.docx")
     "S-2026-0910-002,注射用头孢曲松钠,A20260902,性状,白色或类白色结晶性粉末,符合规定,符合\n"
     "S-2026-0910-002,注射用头孢曲松钠,A20260902,含量,含头孢曲松应为 90.0%~110.0%,99.1%,符合\n"
     "S-2026-0910-002,注射用头孢曲松钠,A20260902,水分,不得过 11.0%,9.7%,符合\n",
-    encoding="utf-8-sig",   # 带 BOM，跟 LIMS 导出的一样
+    encoding="utf-8-sig",   # 带 BOM，跟仪器导出的一样
 )
 
 print("已生成 source/templates/检验报告书模板.docx 与 01_raw_data/检验结果.csv")

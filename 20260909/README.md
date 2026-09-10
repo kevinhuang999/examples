@@ -37,7 +37,7 @@ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple openpyxl
 ├── README.md               ← 本文件，先看这个
 ├── run.py                  ← 再跑这个
 ├── 01_raw_data/            ← 你的原始数据放这
-│   └── results.csv         15 行明细 / 3 个样品，带 BOM，模拟 LIMS 导出
+│   └── results.csv         15 行明细 / 3 个样品，带 BOM，模拟仪器导出
 ├── 02_output/              ← 跑完的成品在这（脚本自动生成）
 └── source/                 ← 模板、日志、维护脚本；日常不用碰
     ├── templates/
