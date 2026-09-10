@@ -22,6 +22,7 @@ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple docxtpl python-docx jinj
 
 跑完看 `02_output/`，两份报告书，回读校验 5 项全绿打印 PASS。
 日志写进 `source/run_log.txt`（UTF-8，**每次追加**，历史留着不覆盖）。
+每段开头先记「运行主机」（主机名 + 本机 IP，用来分辨是哪台机器跑的），再记「开始执行」时间和解释器。
 完成行在结束时立即写下、不等按回车，跑完直接关窗口日志里也有完成时间和判定；
 若某条只有开始没有完成，下次运行会自动补一句「上一条没有留下完成时间」。
 
@@ -73,7 +74,7 @@ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple docxtpl python-docx jinj
 | Python 版本 | 3.9 以上（代码用了 `list[dict]` 注解，3.8 会报 TypeError） |
 | 路径 | 全相对定位，拷到哪都能跑 |
 | 编码 | CSV 是 utf-8-sig，Excel 直接打开中文不乱码 |
-| 日志 | `source/run_log.txt` 每次追加，带开始/完成时间和用时；关窗口也不丢完成行 |
+| 日志 | `source/run_log.txt` 每次追加，先记运行主机（主机名 + IP），再记开始/完成时间和用时；关窗口也不丢完成行 |
 | 要改的地方 | 模板换成 QA 自己的 Word 模板；`01_raw_data/检验结果.csv` 换成真实数据 |
 | 已知限制 | 明细为空时表格只剩表头行，不报错，容易被误认为漏做检项 |
 

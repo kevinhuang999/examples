@@ -10,6 +10,7 @@ Windows 上直接双击 run.py 也行，跑完会停住窗口等回车。
 打包给别人时，把整个目录拷走即可，路径全部相对定位，无硬编码。
 """
 import csv
+import socket
 import subprocess
 import sys
 import time
@@ -211,6 +212,25 @@ def _note_unfinished():
             f.write("（上一条没有留下完成时间，多半是窗口被手动关闭或中途强制中断）\n")
 
 
+def _host_info() -> str:
+    """主机名 + 本机 IP，用来分辨这段日志是哪台机器跑出来的。"""
+    try:
+        host = socket.gethostname()
+    except Exception:
+        host = "unknown"
+    try:
+        # UDP 不会真的发包，只按路由表取本机对外网卡的地址
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+    except Exception:
+        try:
+            ip = socket.gethostbyname(host)
+        except Exception:
+            ip = "未知"
+    return f"{host}（{ip}）"
+
+
 def _run():
     """一次执行 = 追加一段：开始时间 + 过程 + 完成时间。历史日志不覆盖。"""
     LINE = "=" * 60
@@ -218,6 +238,7 @@ def _run():
     _note_unfinished()
     _log = open(LOG_DIR / "run_log.txt", "a", encoding="utf-8")   # 追加，别用 w
     _log.write(f"\n{LINE}\n")
+    _log.write(f"运行主机：{_host_info()}\n")
     _log.write(f"开始执行：{datetime.now():%Y-%m-%d %H:%M:%S}\n")
     _log.write(f"Python   ：{sys.version.split()[0]}  （{Path(sys.executable).name}）\n")
     _log.flush()
