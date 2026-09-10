@@ -1,0 +1,15 @@
+# 文本文件统一用 LF 存储，避免跨平台换行符抖动
+* text=auto eol=lf
+
+# 二进制文件不做任何转换
+*.xlsx binary
+*.xlsm binary
+*.docx binary
+*.doc binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.ico binary
+*.zip binary
+*.exe binary
+*.dll binary
