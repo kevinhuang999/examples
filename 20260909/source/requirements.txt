@@ -1,0 +1,3 @@
+# 本示例唯一依赖。国内镜像装更快：
+#   pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+openpyxl>=3.1
