@@ -1,0 +1,4 @@
+# 本示例依赖（脚本缺了会自动装，这里是备用清单）
+# 安装：pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+pandas>=2.0.0          # 读 Excel、纵向合并、分组汇总
+openpyxl>=3.1.0        # pandas 读写 .xlsx 的引擎
