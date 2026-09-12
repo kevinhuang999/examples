@@ -85,7 +85,8 @@ def main():
     rows.append(["合计", "", "", str(len(rows)), "", "", "", "", "", ""])
     rows.append(["说明：本表由仪器工作站直接导出，空白格表示尚未出结果。", "", "", "", "", "", "", "", "", ""])
 
-    with open(RAW, "w", encoding="utf-8", newline="") as f:
+    # utf-8-sig 带 BOM：Excel 双击打开才不乱码（纯 utf-8 会被 Excel 按 ANSI 解）
+    with open(RAW, "w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f)
         w.writerow(HEAD)
         w.writerows(rows)

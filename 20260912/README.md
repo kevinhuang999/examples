@@ -63,6 +63,9 @@ python source/build_fixtures.py
    改法：进 `Paragraph` 之前统一 `escape()`。
 5. **编号里的斜杠。** 拿 `S/2026/0912/003` 直接当文件名，Windows 上写不出文件。
    改法：`re.sub(r'[\\/:*?"<>|]', "_", ...)` 换成下划线。
+6. **CSV 用 Excel 打开全是乱码。** 纯 UTF-8（不带 BOM）的文件，Excel 双击会按 ANSI 解码，中文全成乱码。
+   改法：`build_fixtures.py` 写 CSV 时用 `utf-8-sig`（带 BOM），Excel 双击直接认；`run.py` 读的时候也用
+   `utf-8-sig`，带不带 BOM 都能读。
 
 ## 验证环境与已知限制
 
@@ -83,4 +86,5 @@ python source/build_fixtures.py
 | 第二页没有列头 | `Table` 没设 `repeatRows` | 加 `repeatRows=1` |
 | 报告里少了几个字 / 多个分号 | 单元格文字没转义 | 进 `Paragraph` 前 `escape()` |
 | 报错说文件名不合法 | 样品编号里有 `\ / : * ? " < > |` | 用 `re.sub` 换掉 |
+| 用 Excel 打开 CSV 全是乱码 | 文件是纯 UTF-8 不带 BOM，Excel 按 ANSI 解了 | 跑 `python source/build_fixtures.py` 重新生成（已带 BOM）；自己的导出文件可用「数据 → 自文本/CSV 导入」选 UTF-8 |
 | 跑完窗口一闪就没了 | 双击运行的窗口在结束后关闭 | 直接跑 `python run.py`，或看 `source/run_log.txt` |
