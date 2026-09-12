@@ -87,6 +87,11 @@ FIELDS = ["样品编号", "样品名称", "批号", "检验项目", "标准规�
           "检验结果", "单位", "单项结论", "检测人", "检测日期"]
 DETAIL_COLS = ["检验项目", "标准规定", "检验结果", "单位", "单项结论"]
 
+# 两张表共用一个总宽，左右边框才对得齐（A4 默认版心约 159mm，别超）
+TABLE_W = 158 * mm
+INFO_W = [22 * mm, 57 * mm, 22 * mm, 57 * mm]        # 抬头表：4 列加起来 = TABLE_W
+DETAIL_W = [40 * mm, 40 * mm, 30 * mm, 24 * mm, 24 * mm]   # 明细表：5 列加起来 = TABLE_W
+
 # 各系统的中文字体位置不一样，逐个试着注册，谁在就用谁
 FONT_CANDIDATES = [
     ("C:/Windows/Fonts/msyh.ttc", 0),
@@ -142,7 +147,7 @@ def make_story(sample_id: str, items: list, font: str) -> list:
         Spacer(1, 6 * mm),
         Table([["样品名称", head["样品名称"], "批号", head["批号"]],
                ["检测人", head["检测人"], "检测日期", head["检测日期"]]],
-              colWidths=[24 * mm, 63 * mm, 24 * mm, 63 * mm],
+              colWidths=INFO_W,
               style=TableStyle([
                   ("FONTNAME", (0, 0), (-1, -1), font),
                   ("FONTSIZE", (0, 0), (-1, -1), 9),
@@ -155,7 +160,7 @@ def make_story(sample_id: str, items: list, font: str) -> list:
     ]
     data = [DETAIL_COLS] + [[item[c] for c in DETAIL_COLS] for item in items]
     data = [[Paragraph(escape(cell), body) for cell in row] for row in data]
-    table = Table(data, colWidths=[46 * mm, 42 * mm, 26 * mm, 20 * mm, 22 * mm], repeatRows=1)
+    table = Table(data, colWidths=DETAIL_W, repeatRows=1)
     table.setStyle(TableStyle([
         ("FONTNAME", (0, 0), (-1, -1), font),
         ("FONTSIZE", (0, 0), (-1, -1), 9),
