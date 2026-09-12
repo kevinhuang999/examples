@@ -181,7 +181,7 @@ def write_output(groups: dict, out_dir: Path, font: str) -> list:
     out_dir.mkdir(parents=True, exist_ok=True)
     made = []
     for sample_id, items in groups.items():
-        safe = re.sub(r'[\\/:*?"<>|]', "_", sample_id)     # 编号里带斜杠，不换掉写不出文件
+        safe = re.sub(r'[\\/:*?"<>|]', "-", sample_id)     # 编号里带斜杠，换掉才写得出文件；统一用连字符，文件名风格一致
         out = out_dir / f"检验报告_{safe}.pdf"
         doc = SimpleDocTemplate(str(out), pagesize=A4, title=f"检验报告 {sample_id}")
         doc.build(make_story(sample_id, items, font))
@@ -209,7 +209,7 @@ def main() -> bool:
     full = [n for n in texts if "2026-0912-004" in n][0]
     check = [
         ("生成 4 份 PDF", len(made) == 4, [p.name for p in made]),
-        ("带斜杠的编号落成了文件名", any("S_2026_0912_003" in n for n in texts), "S_2026_0912_003"),
+        ("带斜杠的编号落成了文件名", any("S-2026-0912-003" in n for n in texts), "S-2026-0912-003"),
         ("汉字没变成方块（标题文字可提取）", "检 验 报 告" in t_all, "检 验 报 告" in t_all),
         ("34 个检项的报告跨了页", pages[full] >= 2, f"{pages[full]} 页"),
         ("第二页的表头也重复了", "检验项目" in texts[full][1] if pages[full] >= 2 else False,

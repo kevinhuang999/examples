@@ -62,7 +62,7 @@ python source/build_fixtures.py
    `<b>` 这类会被当成标签吃掉。都不报错，就是数据悄悄变了。
    改法：进 `Paragraph` 之前统一 `escape()`。
 5. **编号里的斜杠。** 拿 `S/2026/0912/003` 直接当文件名，Windows 上写不出文件。
-   改法：`re.sub(r'[\\/:*?"<>|]', "_", ...)` 换成下划线。
+   改法：`re.sub(r'[\\/:*?"<>|]', "-", ...)` 换成连字符——顺带让这份文件名跟其他编号风格一致。
 6. **CSV 用 Excel 打开全是乱码。** 纯 UTF-8（不带 BOM）的文件，Excel 双击会按 ANSI 解码，中文全成乱码。
    改法：`build_fixtures.py` 写 CSV 时用 `utf-8-sig`（带 BOM），Excel 双击直接认；`run.py` 读的时候也用
    `utf-8-sig`，带不带 BOM 都能读。
