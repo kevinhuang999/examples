@@ -371,13 +371,13 @@ def compare_history(row, history):
 
     变了要标出来：客户问「怎么比上次贵」的时候，报价员手上得有数。
     降了也要标——多半是价目表调过价没通知商务，报出去才发现自己降了一半。
-    查不到历史价是「首次报价」，不是异常；历史价记的是文字（如「待定」）的，
+    查不到历史价是「无历史价」，不是异常；历史价记的是文字（如「待定」）的，
     不能当 0 去算涨幅，那是一除就爆的东西。
     """
     rec = row["rec"]
     last = history.get((cust_key(row["客户名称"]), rec["规范"], norm_method(rec["方法"])))
     if last is None:
-        return "首次报价", "", "", ""
+        return "无历史价", "", "", ""
     last_price, last_day = last
     if last_price is None:
         return "历史价待核", "", "", f"历史台账里这一项记的不是数字（{last_day}），核完再定要不要调"
@@ -401,7 +401,7 @@ def group_customer(rows):
 
 
 def price_customer(rows):
-    """一家客户的报价：先按**能报出来的项数**定折扣档，再逐行乘数量、乘折扣。
+    """一家客户的单价与折扣：先按**能报出来的项数**定档，再逐行乘数量、乘折扣。
 
     金额一律「逐行 round 后再合计」，不许「先加总再乘折扣」——
     后者遇到带小数的单价会跟报价单差一分钱，客户对账时第一个抓的就是这个。
@@ -633,8 +633,8 @@ def verify(entries, quotes):
        f'{count_status("价格变动")} / {[r["变动幅度"] for r in ok_rows if r["状态"] == "价格变动"]}')
     ok("历史价记着文字的标成待核、不当 0 算涨幅",
        count_status("历史价待核") == 1)
-    ok("第一次做的项目标成首次报价",
-       count_status("首次报价") == 11, f'{count_status("首次报价")}')
+    ok("第一次做的项目标成无历史价",
+       count_status("无历史价") == 11, f'{count_status("无历史价")}')
     ok("五项跟历史价对得上（已核对）", count_status("已核对") == 5,
        f'{count_status("已核对")}')
 
