@@ -1,0 +1,2 @@
+# 只有 openpyxl 一个第三方依赖，run.py 缺了会自动用清华源装
+openpyxl>=3.1
