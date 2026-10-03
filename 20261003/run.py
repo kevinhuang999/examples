@@ -44,8 +44,10 @@ COLS = {
 AREA_EMPTY = ("", "-", "—", "n.d.", "nd", "n.a.", "na")
 UNDER_NOTE = "低于线性下限，按半值估"
 
-NORM_RANGE = (98.0, 102.0)      # 目标峰面积归一含量的接受范围（示例口径）
-PARALLEL_LIMIT = 2.0            # 同一样品两次进样，归一含量的相对偏差上限（%）
+# 目标峰面积归一含量的接受范围（示例口径）
+NORM_RANGE = (98.0, 102.0)
+# 同一样品两次进样，归一含量的相对偏差上限（%）
+PARALLEL_LIMIT = 2.0
 
 DETAIL_SHEET, SUMMARY_SHEET, HANG_SHEET = "峰明细", "样品汇总", "挂起清单"
 
@@ -120,7 +122,7 @@ def peak_rule(name, rules):
     for r in rules:
         if r["key"] in name:
             return r
-    return {"key": "", "norm": True, "target": False}   # 规则表没覆盖的，默认参与归一
+    return {"key": "", "norm": True, "target": False}  # 规则表没覆盖的，默认参与归一
 
 
 def parse_area(text):
@@ -436,7 +438,7 @@ def main():
         f"Python {sys.version.split()[0]}（{Path(sys.executable).name}）")
 
     if OUT.exists():
-        shutil.rmtree(OUT)          # 重跑先清空，免得上一版的文件被当成本次结果
+        shutil.rmtree(OUT)  # 重跑先清空，免得上一版的文件被当成本次结果
     OUT.mkdir(parents=True)
 
     rules = load_rules(RULES)
