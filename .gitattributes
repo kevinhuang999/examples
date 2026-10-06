@@ -13,3 +13,9 @@
 *.zip binary
 *.exe binary
 *.dll binary
+
+# Windows 批处理必须保留 CRLF 与原始字节，禁止任何换行转换。
+# 原因：cmd 解析 LF-only 的 .bat 会出现行截断（标签被吃掉、报「不是内部或外部命令」），
+# 且这类脚本常为 GBK 编码，任何文本转换都可能损坏中文。故按二进制处理，字节级原样保存。
+*.bat -text
+*.cmd -text
