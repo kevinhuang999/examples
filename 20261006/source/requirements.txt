@@ -1,0 +1,2 @@
+# 本示例只用 Python 标准库（sqlite3 / csv），无需安装第三方包。
+# 唯一前置条件：SQLite >= 3.24（ON CONFLICT DO UPDATE）。脚本启动时会打印并检查版本。
