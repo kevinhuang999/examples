@@ -1,0 +1,2 @@
+# 本示例只用 Python 标准库（csv / re / datetime / hashlib / socket），无需安装任何第三方包。
+# 保留这个文件，是为了让你一眼确认"真的不用装东西"。
