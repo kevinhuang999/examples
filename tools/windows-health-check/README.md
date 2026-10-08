@@ -1,5 +1,12 @@
 # 工具：Windows 电脑体检与安全优化脚本
 
+[中文](#中文) | [English](#english)
+
+---
+
+<a id="中文"></a>
+# 中文
+
 > **一句话**：双击运行，一次查完 CPU、内存、磁盘、网络、启动项、防火墙，并顺手做一遍可逆的清理与优化——改注册表前自动备份，不碰任何个人文件。
 
 配套 CSDN 文章的可运行脚本。它不是 Python 示例，而是一个独立的 Windows 批处理文件：**下载到本机就能用，不依赖 Python，也不装任何第三方软件**。
@@ -126,3 +133,135 @@
 ## 七、与文章的对应关系
 
 脚本里的每一段都对应文章里的一个步骤。想改脚本的，建议先读文章里的「为什么这么写」——几个关键决策（为什么清理前先算一遍大小、为什么危险项默认否、为什么写 `Run32`）在文章里有说明。
+
+---
+
+<a id="english"></a>
+# English
+
+> **In one sentence**: double-click to run — it checks CPU, memory, disk, network, startup items, and firewall in a single pass, and performs a reversible cleanup and optimization along the way. The registry is backed up before any change, and no personal files are touched.
+
+Runnable script accompanying a CSDN article. It isn't a Python example but a standalone Windows batch file: **download it and it works — no Python, no third-party software**.
+
+---
+
+## 1. How to Use
+
+1. **Download** `windows-health-check.bat` (see section 4, "Encoding Notes", for why you must not copy the web page contents)
+2. **Double-click to run** → a UAC prompt appears → click "Yes" (the script modifies startup items and system settings, so administrator rights are required)
+3. In the main menu, **press the corresponding number key** (keys respond immediately, no Enter needed)
+
+| Option | Purpose | Modifies the system? |
+| --- | --- | --- |
+| `1` | One-click safe optimization: clean caches + flush DNS + disable ad recommendations + SSD TRIM + produce a health report | Yes (all reversible) |
+| `2` | Health report only | **No, strictly read-only** |
+| `3` | Disk junk cleanup (includes recycle bin, with a separate second confirmation) | Yes |
+| `4` | Network diagnostics and optimization (flush DNS / tune TCP / switch public DNS / heavy reset) | Optional |
+| `5` | Startup item inspection (lists all autostart entries + enabled/disabled state + disabled leftovers) | Optional |
+| `6` | System file repair (sfc + DISM, takes 10–30 minutes) | Yes (official repair procedure) |
+| `7` | Privacy and ad optimization (turn off ad ID, recommended content, lock screen promotions; enable Storage Sense) | Yes (reversible) |
+| `8` | C: drive SSD maintenance (TRIM + disk health check) | Yes (garbage collection only) |
+
+The health report is written to the desktop as `电脑体检报告.txt`, in ten sections: system overview, CPU, memory, disk space, physical disk health, cleanable caches, startup item count, network, security status, and recommendations.
+
+---
+
+## 2. Safety Boundaries (enforced in code, not just promised)
+
+- **Never deletes any personal file** — documents, photos, downloads, and data are untouched. Only caches the system can rebuild are cleaned (user temp, Windows temp, error reports, update download cache, Delivery Optimization cache).
+- **Registry backed up automatically before changes** — exported to `reg_backup\` next to the script; to restore, just double-click the `.reg` file.
+- **Irreversible operations confirmed separately** — emptying the recycle bin or resetting the network stack asks again; both confirmation dialogs **default to "No"** when idle (they time out and skip rather than execute by accident).
+- **Slow steps announced in advance** — cleanup warns that it "may take 1–2 minutes with many files", so no one assumes it has hung.
+- **Never modifies personal settings** — no changes to the desktop, IME, browser homepage, and no software installed.
+
+---
+
+## 3. Field Notes: Pitfalls This Script Hit
+
+These pitfalls really happened. They're documented here because **they're more valuable than the script itself** — anyone writing batch scripts will likely run into them too.
+
+### 1. Chinese text in a batch file requires GBK encoding + CRLF line endings
+
+- **UTF-8 encoding**: cmd interprets it as GBK, and all Chinese text turns into mojibake.
+- **LF-only line endings** (Unix style): cmd's line parsing breaks down, labels get truncated (`:REPAIR` read as `EPAIR`), and you get a flood of "not recognized as an internal or external command" errors.
+- **UTF-8 + `chcp 65001`**: looks like the most modern approach, but in testing it **caused byte-offset misalignment in long scripts** — some command lines were cut in half, producing bizarre errors like "`化` is not recognized as an internal or external command". So it was ultimately not used.
+
+### 2. Literal `%` in body text must be written as `%%`
+
+One report-generating line reads "Keep C: drive free space above 15%". This single line makes cmd treat `% above…%` as a variable name, **swallowing the entire text in between** and truncating the commands concatenated after it, producing syntax errors.
+
+In batch files, `%` is the variable delimiter — always write literal percent signs as `%%`.
+
+### 3. Where the "disabled" marker for startup items lives differs for 32-bit programs
+
+Clicking "Disable" on a startup item in Task Manager doesn't write to the `Run` key itself, but to a parallel state table:
+
+| Location of the autostart entry | Where the disable marker goes |
+| --- | --- |
+| `HKLM\...\CurrentVersion\Run` | `HKLM\...\Explorer\StartupApproved\Run` |
+| `HKCU\...\CurrentVersion\Run` | `HKCU\...\Explorer\StartupApproved\Run` |
+| `HKLM\...\WOW6432Node\...\Run` (32-bit programs) | `HKLM\...\Explorer\StartupApproved\Run32` |
+
+**Note the last row**: although 32-bit autostart entries live under `WOW6432Node`, their disable marker goes in the **parent-level** `StartupApproved\Run32`, not under the `WOW6432Node` path. Writing to the wrong location fails silently — the command returns success while the item still launches at boot.
+
+The marker itself is `REG_BINARY`: first byte `0x03` = disabled, `0x02` = enabled, followed by an 8-byte timestamp.
+
+### 4. Using PowerShell to read startup items beats `reg query`
+
+`reg query` output has to be parsed with `for /f`, and the Chinese text may be mojibake if the code page is wrong. Reading the registry with PowerShell gives you control over the output format and lets you print "enabled / disabled" alongside each entry.
+
+### 5. ★ Don't use `set /p` for confirmation prompts — a Chinese IME will swallow the Enter key
+
+This is **the single most disruptive pitfall**. The original "Execute? (Y/N):" prompt used `set /p`, which requires typing a character and pressing Enter.
+
+In real use, when a Chinese input method is active, pressing Enter gets intercepted by the IME — **the `y` shows up on screen but the cursor doesn't move, and the program sits quietly waiting for an Enter that will never come**, looking exactly like a hung script.
+
+There are two fixes, and this project uses both:
+
+- **Switch to the `choice` command**: a single keypress responds immediately, no Enter required.
+- **Add a timeout fallback to every confirmation**: `choice /c yn /n /t 20 /d y` — if no key is pressed within 20 seconds, it proceeds with the default. **Safe operations default to "Yes" (e.g. cache cleanup); dangerous ones default to "No" (e.g. emptying the recycle bin)**. Worst case, the script finishes on its own instead of stalling.
+
+> Conclusion: for interactive batch scripts aimed at Chinese users, `set /p` is an unreliable way to do Y/N confirmation.
+
+---
+
+## 4. Encoding Notes (Important)
+
+This is a **GBK-encoded** batch file. Command lines on Chinese versions of Windows interpret text as GBK by default, while UTF-8 Chinese causes truncated-line parse errors in cmd (see section 3, item 1).
+
+Therefore:
+
+- **Viewing it directly on the web page shows mojibake — this is normal** and does not mean the file is corrupted.
+- **Please download the original file to use it** (click "Clone/Download" → download the file, or use the raw link).
+- **Do not** copy the text shown on the web page and save it yourself — saving as UTF-8 will cause errors when run.
+
+---
+
+## 5. Verified Environment and Known Limitations
+
+| Item | Notes |
+| --- | --- |
+| Verified on | Windows 11 Pro (Build 26300), administrator console |
+| Dependencies | None. Uses only built-in Windows commands (`choice` / `del` / `netsh` / `DISM` / `sfc` / `defrag`) and the bundled PowerShell 5.1 |
+| Not applicable to | Windows 7 and earlier (`choice` behavior and cmdlets like `Get-PhysicalDisk` are unavailable); some policy items may be ignored on Windows Home |
+| Antivirus prompts | The script reads and writes the registry and startup items; some security software may prompt — choose "Allow" |
+
+---
+
+## 6. Troubleshooting
+
+| Symptom | Cause | What to do |
+| --- | --- | --- |
+| Mojibake on open, all boxes | The file was saved as UTF-8 at some point | Re-download the original; don't copy from the web page |
+| "Not recognized as an internal or external command" with half-sentences | Line endings were converted to LF, or the encoding was converted | Re-download; don't re-save in an editor |
+| A flash and it's gone after double-clicking | Not run as administrator, or blocked by antivirus | Right-click → "Run as administrator"; check your security software's block log |
+| Stuck at a confirmation prompt | The Chinese IME intercepted Enter | Press `Y` once (no Enter needed), or wait 20 seconds for it to continue automatically |
+| No noticeable free space after cleanup | NTFS delays space release by about 20 seconds after deleting large files | Wait a moment and refresh "This PC" |
+| An item reports "operation failed, item may not exist" | That startup item isn't present on this machine — normal | No action needed |
+| Firewall/antivirus alert | The script modifies startup items and the registry | Choose "Allow", or read the safety boundaries in section 2 first |
+
+---
+
+## 7. Relationship to the Article
+
+Every section of the script corresponds to a step in the article. If you want to modify the script, read the article's "why it's written this way" first — several key decisions (why sizes are computed before cleaning, why dangerous items default to No, why `Run32` must be written) are explained there.
